@@ -15,3 +15,10 @@ with
 
 ```var parseString = require('fast-xml2js').parseString;```
 
+Then call it like so:
+
+```
+parseString('<some_xml>', function(err, result) {
+    console.log(result);
+});
+```

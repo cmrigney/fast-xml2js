@@ -1,7 +1,7 @@
 {
   "name": "fast-xml2js",
-  "version": "1.0.3",
-  "description": "In-place replacement for xml2js. This is about 20x faster and makes use of the rapidxml C++ library.",
+  "version": "1.0.4",
+  "description": "In-place replacement for xml2js parseString. This is about 20x faster and makes use of the rapidxml C++ library.",
   "main": "fast-xml2js/fast-xml2js.node",
   "scripts": {
     "preinstall": "node-gyp configure && node-gyp build"
