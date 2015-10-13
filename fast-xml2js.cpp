@@ -2,7 +2,7 @@
 #include <node.h>
 #include "rapidxml/rapidxml_utils.hpp"
 #include <stack>
-#include <iostream>
+#include <cstring>
 
 namespace fastxml2js {
 
@@ -46,7 +46,7 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
   String::Utf8Value param1(args[0]->ToString());
   
   char *xml = new char[param1.length() + 1];
-  strcpy(xml, *param1);
+  std::strcpy(xml, *param1);
   
   xml_document<> doc;
   doc.parse<0>(xml);
