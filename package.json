@@ -1,0 +1,30 @@
+{
+  "name": "fast-xml2js",
+  "version": "1.0.1",
+  "description": "In-place replacement for xml2js. This is about 20x faster and makes use of the rapidxml C++ library.",
+  "main": "fast-xml2js/fast-xml2js.node",
+  "scripts": {
+    "preinstall": "node-gyp configure && node-gyp build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codyrigney92/fast-xml2js.git"
+  },
+  "keywords": [
+    "xml2js",
+    "C++"
+  ],
+  "author": {
+    "name": "Cody Rigney"
+  },
+  "license": "MIT",
+  "gypfile": true,
+  "bugs": {
+    "url": "https://github.com/codyrigney92/fast-xml2js/issues"
+  },
+  "homepage": "https://github.com/codyrigney92/fast-xml2js#readme",
+  "readme": "ERROR: No README data found!",
+  "_id": "fast-xml2js@1.0.1",
+  "_shasum": "7fc66b1400e1ad73b1d6bdbba006831595cf84cd",
+  "_from": "fast-xml2js@*"
+}
