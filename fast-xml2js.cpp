@@ -122,7 +122,21 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
             obj->Set(String::NewFromUtf8(isolate, node->name()), lst);
           }
           
-          lst->Set(lst->Length()-1, String::NewFromUtf8(isolate, node->first_node()->value()));
+          if(node->first_attribute()) {
+            Local<Object> attrObj = Object::New(isolate);
+            newObj->Set(String::NewFromUtf8(isolate, "_"), String::NewFromUtf8(isolate, node->first_node()->value()));
+            newObj->Set(String::NewFromUtf8(isolate, "$"), attrObj);
+            
+            for(xml_attribute<> *attr = node->first_attribute(); attr; attr = attr->next_attribute())
+            {
+              attrObj->Set(String::NewFromUtf8(isolate, attr->name()), String::NewFromUtf8(isolate, attr->value()));
+            }
+            
+            lst->Set(lst->Length()-1, newObj);
+          }
+          else {
+            lst->Set(lst->Length()-1, String::NewFromUtf8(isolate, node->first_node()->value()));
+          }
         }
         else
         {

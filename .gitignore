@@ -1,3 +1,6 @@
+build/
+fast-xml2js/
+
 # Logs
 logs
 *.log
