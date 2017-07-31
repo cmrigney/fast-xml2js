@@ -21,49 +21,48 @@ using namespace rapidxml;
 
 void ParseString(const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = args.GetIsolate();
-  
-  if(args.Length() != 2) 
+
+  if(args.Length() != 2)
   {
     isolate->ThrowException(Exception::TypeError(
       String::NewFromUtf8(isolate, "Wrong number of arguments")));
     return;
   }
-  
+
   if(!args[0]->IsString())
   {
     isolate->ThrowException(Exception::TypeError(
       String::NewFromUtf8(isolate, "First argument must be a string")));
     return;
   }
-  
+
   if(!args[1]->IsFunction())
   {
     isolate->ThrowException(Exception::TypeError(
       String::NewFromUtf8(isolate, "Second argument must be a callback")));
     return;
   }
-  
+
   String::Utf8Value param1(args[0]->ToString());
-  
+
   char *xml = new char[param1.length() + 1];
   std::strcpy(xml, *param1);
-  
-  xml_document<> doc;
-  doc.parse<0>(xml);
-  
+
   Local<Object> obj = Object::New(isolate);
-  
-  std::stack<xml_node<> *> nodeStack;
-  std::stack<Local<Object> > objStack;
-  
-  nodeStack.push(doc.first_node());
-  objStack.push(obj);
-  
   Local<Value> errorString = Null(isolate);
-  
+
   try
   {
-    
+
+    xml_document<> doc;
+    doc.parse<0>(xml);
+
+    std::stack<xml_node<> *> nodeStack;
+    std::stack<Local<Object> > objStack;
+
+    nodeStack.push(doc.first_node());
+    objStack.push(obj);
+
     while(nodeStack.size() > 0)
     {
       xml_node<> *node = nodeStack.top();
@@ -73,18 +72,18 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
         objStack.pop();
         continue;
       }
-      
+
       Local<Object> obj = objStack.top();
-      
+
       Local<Object> newObj = Object::New(isolate);
-      
+
       bool hasChild = false;
-      
+
       //Need to reduce duplicate code here
       if(!node->first_node() || (node->first_node() && node->first_node()->type() != node_cdata && node->first_node()->type() != node_data))
       {
         hasChild = true;
-        
+
         Local<Array> lst;
         if(node != doc.first_node())
         {
@@ -98,7 +97,7 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
             lst = Array::New(isolate, 1);
             obj->Set(String::NewFromUtf8(isolate, node->name()), lst);
           }
-          
+
           lst->Set(lst->Length()-1, newObj);
         }
         else
@@ -121,17 +120,17 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
             lst = Array::New(isolate, 1);
             obj->Set(String::NewFromUtf8(isolate, node->name()), lst);
           }
-          
+
           if(node->first_attribute()) {
             Local<Object> attrObj = Object::New(isolate);
             newObj->Set(String::NewFromUtf8(isolate, "_"), String::NewFromUtf8(isolate, node->first_node()->value()));
             newObj->Set(String::NewFromUtf8(isolate, "$"), attrObj);
-            
+
             for(xml_attribute<> *attr = node->first_attribute(); attr; attr = attr->next_attribute())
             {
               attrObj->Set(String::NewFromUtf8(isolate, attr->name()), String::NewFromUtf8(isolate, attr->value()));
             }
-            
+
             lst->Set(lst->Length()-1, newObj);
           }
           else {
@@ -143,29 +142,29 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
           obj->Set(String::NewFromUtf8(isolate, node->name()), String::NewFromUtf8(isolate, node->first_node()->value()));
         }
       }
-      
+
       nodeStack.pop();
       nodeStack.push(node->next_sibling());
-      
+
       if(hasChild) {
-        
+
         if(node->first_attribute())
         {
           Local<Object> attrObj = Object::New(isolate);
           newObj->Set(String::NewFromUtf8(isolate, "$"), attrObj);
-          
+
           for(xml_attribute<> *attr = node->first_attribute(); attr; attr = attr->next_attribute())
           {
             attrObj->Set(String::NewFromUtf8(isolate, attr->name()), String::NewFromUtf8(isolate, attr->value()));
           }
         }
-        
+
         nodeStack.push(node->first_node());
         objStack.push(newObj);
       }
-      
+
     }
-  
+
   }
   catch (const std::runtime_error& e)
   {
@@ -187,13 +186,13 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
   {
     errorString = String::NewFromUtf8(isolate, "An unknown error occurred while parsing.");
   }
-  
+
   delete[] xml;
-  
+
   Local<Function> cb = Local<Function>::Cast(args[1]);
   const unsigned argc = 2;
   Local<Value> argv[argc] = { errorString, obj };
-  
+
   cb->Call(Null(isolate), argc, argv);
 }
 
