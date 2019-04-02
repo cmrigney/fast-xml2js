@@ -44,8 +44,9 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
     return;
   }
 
-  String::Utf8Value param1(args[0]->ToString());
+  Local<Context> ctx = Context::New(isolate);
 
+  v8::String::Utf8Value param1(args[0]);
   char *xml = new char[param1.length() + 1];
   std::strcpy(xml, *param1);
 
@@ -59,7 +60,7 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
     doc.parse<0>(xml);
 
     std::stack<xml_node<> *> nodeStack;
-    std::stack<Local<Object> > objStack;
+    std::stack<Local<Object>> objStack;
 
     nodeStack.push(doc.first_node());
     objStack.push(obj);
@@ -79,8 +80,6 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
       Local<Object> newObj = Object::New(isolate);
 
       bool hasChild = false;
-
-      Local<Context> ctx = Context::New(isolate);
 
       //Need to reduce duplicate code here
       if(!node->first_node() || (node->first_node() && node->first_node()->type() != node_cdata && node->first_node()->type() != node_data))
