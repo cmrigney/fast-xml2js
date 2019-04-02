@@ -44,11 +44,13 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
     return;
   }
 
-  Local<Context> ctx = Context::New(isolate);
+  Local<Context> ctx = isolate->GetCurrentContext();
 
-  v8::String::Utf8Value param1(args[0]);
-  char *xml = new char[param1.length() + 1];
-  std::strcpy(xml, *param1);
+  // String::Utf8Value param1(args[0]);
+  auto param1 = args[0]->ToString(ctx).ToLocalChecked();
+  char *xml = new char[param1->Length() + 1];
+  // std::strcpy(xml, param1->)
+  param1->WriteUtf8(isolate, xml);
 
   Local<Object> obj = Object::New(isolate);
   Local<Value> errorString = Null(isolate);
