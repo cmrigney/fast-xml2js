@@ -12,6 +12,7 @@ using v8::FunctionCallbackInfo;
 using v8::Isolate;
 using v8::Local;
 using v8::Object;
+using v8::Context;
 using v8::String;
 using v8::Number;
 using v8::Value;
@@ -79,6 +80,8 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
 
       bool hasChild = false;
 
+      Local<Context> ctx = Context::New(isolate);
+
       //Need to reduce duplicate code here
       if(!node->first_node() || (node->first_node() && node->first_node()->type() != node_cdata && node->first_node()->type() != node_data))
       {
@@ -87,7 +90,9 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
         Local<Array> lst;
         if(node != doc.first_node())
         {
-          if(obj->HasOwnProperty(String::NewFromUtf8(isolate, node->name())))
+
+          bool hasProperty = obj->HasOwnProperty(ctx, String::NewFromUtf8(isolate, node->name())).FromMaybe(false);
+          if(hasProperty)
           {
             lst = Local<Array>::Cast(obj->Get(String::NewFromUtf8(isolate, node->name())));
             lst->Set(String::NewFromUtf8(isolate, "length"), Number::New(isolate, lst->Length() + 1));
@@ -110,7 +115,8 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
         Local<Array> lst;
         if(node != doc.first_node())
         {
-          if(obj->HasOwnProperty(String::NewFromUtf8(isolate, node->name())))
+          bool hasProperty = obj->HasOwnProperty(ctx, String::NewFromUtf8(isolate, node->name())).FromMaybe(false);
+          if(hasProperty)
           {
             lst = Local<Array>::Cast(obj->Get(String::NewFromUtf8(isolate, node->name())));
             lst->Set(String::NewFromUtf8(isolate, "length"), Number::New(isolate, lst->Length() + 1));
