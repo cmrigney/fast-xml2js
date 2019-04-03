@@ -44,12 +44,10 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
     return;
   }
 
-  Local<Context> ctx = isolate->GetCurrentContext();
+  Local<Context> context = Context::New(isolate);
 
-  // String::Utf8Value param1(args[0]);
-  auto param1 = args[0]->ToString(ctx).ToLocalChecked();
+  auto param1 = args[0]->ToString(context).ToLocalChecked();
   char *xml = new char[param1->Length() + 1];
-  // std::strcpy(xml, param1->)
   param1->WriteUtf8(isolate, xml);
 
   Local<Object> obj = Object::New(isolate);
@@ -92,7 +90,7 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
         if(node != doc.first_node())
         {
 
-          bool hasProperty = obj->HasOwnProperty(ctx, String::NewFromUtf8(isolate, node->name())).FromMaybe(false);
+          bool hasProperty = obj->HasOwnProperty(context, String::NewFromUtf8(isolate, node->name())).FromMaybe(false);
           if(hasProperty)
           {
             lst = Local<Array>::Cast(obj->Get(String::NewFromUtf8(isolate, node->name())));
@@ -116,7 +114,7 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
         Local<Array> lst;
         if(node != doc.first_node())
         {
-          bool hasProperty = obj->HasOwnProperty(ctx, String::NewFromUtf8(isolate, node->name())).FromMaybe(false);
+          bool hasProperty = obj->HasOwnProperty(context, String::NewFromUtf8(isolate, node->name())).FromMaybe(false);
           if(hasProperty)
           {
             lst = Local<Array>::Cast(obj->Get(String::NewFromUtf8(isolate, node->name())));
