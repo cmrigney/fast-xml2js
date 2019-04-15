@@ -18,10 +18,6 @@
   "author": "Cody Rigney",
   "license": "MIT",
   "gypfile": true,
-  "bugs": {
-    "url": "https://github.com/codyrigney92/fast-xml2js/issues"
-  },
-  "homepage": "https://github.com/codyrigney92/fast-xml2js#readme",
   "devDependencies": {
     "chai": "^4.2.0",
     "mocha": "^6.1.3"
