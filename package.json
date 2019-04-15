@@ -1,14 +1,14 @@
 {
-  "name": "fast-xml2js",
-  "version": "1.0.7",
-  "description": "In-place replacement for xml2js parseString. This is about 20x-30x faster and makes use of the rapidxml C++ library.",
+  "name": "@pjaromin/fast-xml2js",
+  "version": "1.1.0",
+  "description": "Fork of cmrigney/fast-xml2js. In-place replacement for xml2js parseString. This is about 20x-30x faster and makes use of the rapidxml C++ library.",
   "main": "index.js",
   "scripts": {
     "preinstall": "node-gyp configure && node-gyp build"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/codyrigney92/fast-xml2js.git"
+    "url": "git+https://github.com/piotrjaromin/fast-xml2js.git"
   },
   "keywords": [
     "xml2js",
