@@ -1,0 +1,11 @@
+<data>
+    <description>Root description</description>
+    <entry>
+        <name>First entry</name>
+        <description>Entry description</description>
+    </entry>
+    <entry>
+        <name>Second entry</name>
+        <description>second entry description</description>
+    </entry>
+</data>
