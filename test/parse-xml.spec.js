@@ -15,6 +15,9 @@ describe('parseXml should', () => {
             expect(data).to.eql(
                 {
                     data: {
+                        '$': {
+                            type: 'some-random-type'
+                        },
                         description: ['Root description'],
                         entry: [
                             {
