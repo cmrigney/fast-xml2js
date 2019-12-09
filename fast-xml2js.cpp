@@ -47,7 +47,7 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
   Local<Context> context = Context::New(isolate);
 
   auto param1 = args[0]->ToString(context).ToLocalChecked();
-  char *xml = new char[param1->Utf8Length() + 1];
+  char *xml = new char[param1->Utf8Length(isolate) + 1];
   param1->WriteUtf8(isolate, xml);
 
   Local<Object> obj = Object::New(isolate);
@@ -198,7 +198,7 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
   const unsigned argc = 2;
   Local<Value> argv[argc] = { errorString, obj };
 
-  cb->Call(Null(isolate), argc, argv);
+  cb->Call(context, Null(isolate), argc, argv);
 }
 
 void init(Local<Object> exports) {
