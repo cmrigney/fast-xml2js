@@ -216,7 +216,8 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
   const unsigned argc = 2;
   Local<Value> argv[argc] = { errorString, obj };
 
-  cb->Call(context, Null(isolate), argc, argv);
+  Nan::Callback callback(cb);
+  Nan::Call(callback, argc, argv);
 }
 
 void init(Local<Object> exports) {
