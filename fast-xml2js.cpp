@@ -1,5 +1,7 @@
 // fast-xml2js.cpp
 #include <node.h>
+#include <nan.h>
+
 #include "rapidxml/rapidxml_utils.hpp"
 #include <stack>
 #include <cstring>
@@ -17,8 +19,23 @@ using v8::String;
 using v8::Number;
 using v8::Value;
 using v8::Array;
+using v8::NewStringType;
 
 using namespace rapidxml;
+
+Local<String> str(Isolate* isolate, const char *value) {
+  return String::NewFromUtf8(
+    isolate,
+    value,
+    NewStringType::kNormal,
+    static_cast<int>(strlen(value))
+  ).ToLocalChecked();
+}
+
+
+Local<String> strNode(Isolate* isolate, xml_node<> *node) {
+  return str(isolate, node->name());
+}
 
 void ParseString(const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = args.GetIsolate();
@@ -26,21 +43,21 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
   if(args.Length() != 2)
   {
     isolate->ThrowException(Exception::TypeError(
-      String::NewFromUtf8(isolate, "Wrong number of arguments")));
+      str(isolate, "Wrong number of arguments")));
     return;
   }
 
   if(!args[0]->IsString())
   {
     isolate->ThrowException(Exception::TypeError(
-      String::NewFromUtf8(isolate, "First argument must be a string")));
+      str(isolate, "First argument must be a string")));
     return;
   }
 
   if(!args[1]->IsFunction())
   {
     isolate->ThrowException(Exception::TypeError(
-      String::NewFromUtf8(isolate, "Second argument must be a callback")));
+      str(isolate, "Second argument must be a callback")));
     return;
   }
 
@@ -90,23 +107,24 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
         if(node != doc.first_node())
         {
 
-          bool hasProperty = obj->HasOwnProperty(context, String::NewFromUtf8(isolate, node->name())).FromMaybe(false);
+          bool hasProperty = obj->HasOwnProperty(context, strNode(isolate, node)).FromMaybe(false);
+
           if(hasProperty)
           {
-            lst = Local<Array>::Cast(obj->Get(String::NewFromUtf8(isolate, node->name())));
-            lst->Set(String::NewFromUtf8(isolate, "length"), Number::New(isolate, lst->Length() + 1));
+            lst = Local<Array>::Cast(Nan::Get(obj, strNode(isolate, node)).ToLocalChecked());
+            Nan::Set(lst, str(isolate, "length"), Number::New(isolate, lst->Length() + 1));
           }
           else
           {
             lst = Array::New(isolate, 1);
-            obj->Set(String::NewFromUtf8(isolate, node->name()), lst);
+            Nan::Set(obj, strNode(isolate, node), lst);
           }
 
-          lst->Set(lst->Length()-1, newObj);
+          Nan::Set(lst, lst->Length()-1, newObj);
         }
         else
         {
-          obj->Set(String::NewFromUtf8(isolate, node->name()), newObj);
+          Nan::Set(obj, strNode(isolate, node), newObj);
         }
       }
       else
@@ -114,37 +132,37 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
         Local<Array> lst;
         if(node != doc.first_node())
         {
-          bool hasProperty = obj->HasOwnProperty(context, String::NewFromUtf8(isolate, node->name())).FromMaybe(false);
+          bool hasProperty = obj->HasOwnProperty(context,  strNode(isolate, node)).FromMaybe(false);
           if(hasProperty)
           {
-            lst = Local<Array>::Cast(obj->Get(String::NewFromUtf8(isolate, node->name())));
-            lst->Set(String::NewFromUtf8(isolate, "length"), Number::New(isolate, lst->Length() + 1));
+            lst = Local<Array>::Cast(Nan::Get(obj, str(isolate, node->name())).ToLocalChecked());
+            Nan::Set(lst, str(isolate, "length"), Number::New(isolate, lst->Length() + 1));
           }
           else
           {
             lst = Array::New(isolate, 1);
-            obj->Set(String::NewFromUtf8(isolate, node->name()), lst);
+            Nan::Set(obj, strNode(isolate, node), lst);
           }
 
           if(node->first_attribute()) {
             Local<Object> attrObj = Object::New(isolate);
-            newObj->Set(String::NewFromUtf8(isolate, "_"), String::NewFromUtf8(isolate, node->first_node()->value()));
-            newObj->Set(String::NewFromUtf8(isolate, "$"), attrObj);
+            Nan::Set(newObj, str(isolate, "_"), str(isolate, node->first_node()->value()));
+            Nan::Set(newObj, str(isolate, "$"), attrObj);
 
             for(xml_attribute<> *attr = node->first_attribute(); attr; attr = attr->next_attribute())
             {
-              attrObj->Set(String::NewFromUtf8(isolate, attr->name()), String::NewFromUtf8(isolate, attr->value()));
+              Nan::Set(attrObj, str(isolate, attr->name()), str(isolate, attr->value()));
             }
 
-            lst->Set(lst->Length()-1, newObj);
+            Nan::Set(lst, lst->Length()-1, newObj);
           }
           else {
-            lst->Set(lst->Length()-1, String::NewFromUtf8(isolate, node->first_node()->value()));
+            Nan::Set(lst, lst->Length()-1, str(isolate, node->first_node()->value()));
           }
         }
         else
         {
-          obj->Set(String::NewFromUtf8(isolate, node->name()), String::NewFromUtf8(isolate, node->first_node()->value()));
+          Nan::Set(obj, str(isolate, node->name()), str(isolate, node->first_node()->value()));
         }
       }
 
@@ -156,11 +174,11 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
         if(node->first_attribute())
         {
           Local<Object> attrObj = Object::New(isolate);
-          newObj->Set(String::NewFromUtf8(isolate, "$"), attrObj);
+          Nan::Set(newObj, str(isolate, "$"), attrObj);
 
           for(xml_attribute<> *attr = node->first_attribute(); attr; attr = attr->next_attribute())
           {
-            attrObj->Set(String::NewFromUtf8(isolate, attr->name()), String::NewFromUtf8(isolate, attr->value()));
+            Nan::Set(attrObj, str(isolate, attr->name()), str(isolate, attr->value()));
           }
         }
 
@@ -173,15 +191,15 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
   }
   catch (const std::runtime_error& e)
   {
-    errorString = String::NewFromUtf8(isolate, e.what());
+    errorString = str(isolate, e.what());
   }
   catch (const rapidxml::parse_error& e)
   {
-    errorString = String::NewFromUtf8(isolate, e.what());
+    errorString = str(isolate, e.what());
   }
   catch (const std::exception& e)
   {
-    errorString = String::NewFromUtf8(isolate, e.what());
+    errorString = str(isolate, e.what());
   }
   catch (const Local<Value>& e)
   {
@@ -189,7 +207,7 @@ void ParseString(const FunctionCallbackInfo<Value>& args) {
   }
   catch (...)
   {
-    errorString = String::NewFromUtf8(isolate, "An unknown error occurred while parsing.");
+    errorString = str(isolate, "An unknown error occurred while parsing.");
   }
 
   delete[] xml;

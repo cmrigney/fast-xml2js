@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "preinstall": "node-gyp configure && node-gyp build",
-    "test": "mocha --recursive test"
+    "test": "mocha --recursive test",
+    "compile": "node-gyp rebuild"
   },
   "repository": {
     "type": "git",
@@ -24,5 +25,9 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "nan": "^2.14.0",
+    "node-gyp": "^6.0.1"
   }
 }

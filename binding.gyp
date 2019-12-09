@@ -2,6 +2,9 @@
   "targets": [
     {
       "target_name": "fast-xml2js",
+      "include_dirs": [
+        "<!(node -e \"require('nan')\")"
+      ],
       "sources": [ "fast-xml2js.cpp", "rapidxml/rapidxml.hpp", "rapidxml/rapidxml_iterators.hpp", "rapidxml/rapidxml_print.hpp", "rapidxml/rapidxml_utils.hpp" ],
       "cflags!": ['-fno-exceptions'],
       "cflags_cc!": ['-fno-exceptions'],
