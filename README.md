@@ -20,3 +20,7 @@ parseString('<some_xml>', function(err, result) {
     console.log(result);
 });
 ```
+
+### Changelog
+
+Change log can be found [here](CHANGELOG.md)
