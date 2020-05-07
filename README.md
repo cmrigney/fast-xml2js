@@ -1,4 +1,7 @@
 # fast-xml2js
+
+**UPDATE: I'm no longer maintaining this project. If you would like to take it over or you know of a solid fork, please reach out!**
+
 In-place replacement for xml2js parseString. This is about 20x-30x faster and makes use of the rapidxml C++ library.
 
 ### Install
